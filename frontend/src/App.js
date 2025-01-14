@@ -1,10 +1,25 @@
 import './App.css';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 import UploadPage from './pages/uploadPage'; // Ensure this path is correct
 
 function App() {
   const [walletAddress, setWalletAddress] = useState(null);
+  const [welcomeMessage, setWelcomeMessage] = useState('');
+
+  useEffect(() => {
+    const fetchWelcomeMessage = async () => {
+      try {
+        const response = await fetch('/home');
+        const data = await response.json();
+        setWelcomeMessage(data.message);
+      } catch (error) {
+        console.error('Error fetching welcome message:', error);
+      }
+    };
+
+    fetchWelcomeMessage();
+  }, []);
 
   const connectWallet = async () => {
     if (window.ethereum) {
@@ -25,6 +40,7 @@ function App() {
     <Router>
       <div className="App">
         <header className="App-header">
+          <h1>{welcomeMessage}</h1>
           {walletAddress ? (
             <div>
               <p>Wallet connected successfully!</p>

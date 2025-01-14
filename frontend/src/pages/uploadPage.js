@@ -1,9 +1,26 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 function UploadPage({ walletAddress }) {
   const [file, setFile] = useState(null);
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
+  const [nfts, setNfts] = useState([]);
+
+  useEffect(() => {
+    const fetchNfts = async () => {
+      try {
+        const response = await fetch(`/nfts/${walletAddress}`);
+        const data = await response.json();
+        setNfts(data);
+      } catch (error) {
+        console.error('Error fetching NFTs:', error);
+      }
+    };
+
+    if (walletAddress) {
+      fetchNfts();
+    }
+  }, [walletAddress]);
 
   const handleFileChange = (event) => {
     setFile(event.target.files[0]);
@@ -32,6 +49,17 @@ function UploadPage({ walletAddress }) {
   return (
     <div>
       <h1>Upload Page</h1>
+      <div>
+        <h2>Your NFTs</h2>
+        <ul>
+          {nfts.map((nft, index) => (
+            <li key={index}>
+              <img src={nft.image_url} alt={nft.name} width="100" />
+              <p>{nft.name}</p>
+            </li>
+          ))}
+        </ul>
+      </div>
       <form onSubmit={handleSubmit}>
         <div>
           <label>
